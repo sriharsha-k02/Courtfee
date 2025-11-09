@@ -1,154 +1,293 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Badminton Cost Calculator</title>
-    <style>
-        body { font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f4f4f4; }
-        h2 { color: #0066cc; }
-        label { display: block; margin-top: 10px; font-weight: bold; }
-        input[type="number"] { width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box; }
-        .button-group { display: flex; gap: 10px; margin-top: 20px; }
-        .button-group button { flex-grow: 1; padding: 10px 15px; border: none; cursor: pointer; color: white; }
-        #calculateBtn { background-color: #0066cc; }
-        #resetBtn { background-color: #cc0000; }
-		#resetBlk { background-color: #cc0000; }
-        #results { margin-top: 30px; padding: 15px; border: 1px solid #ccc; background-color: #fff; }
-        .result-item { margin-bottom: 8px; }
-        .cost { font-weight: bold; color: green; font-size: 1.1em; }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏸 Badminton Cost Calculator</title>
+    <style>
+        /* --- Global & Base Styles --- */
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            max-width: 650px; /* Slightly wider container */
+            margin: 0 auto; 
+            padding: 20px; 
+            background-color: #f0f4f8; /* Light blue/gray background */
+            color: #333;
+        }
+        
+        /* --- Card Container for Inputs --- */
+        .calculator-card {
+            background-color: #ffffff;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+            margin-bottom: 25px;
+        }
+
+        h2 { 
+            color: #0d47a1; /* Deep Blue */
+            border-bottom: 3px solid #bbdefb;
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+        p { margin-bottom: 10px; line-height: 1.5; }
+        
+        /* --- Input Layout --- */
+        .input-group {
+            display: flex;
+            flex-wrap: wrap; 
+            gap: 20px; /* Increased gap for better spacing */
+        }
+        .input-pair {
+            flex: 1 1 100%; 
+        }
+        @media (min-width: 450px) {
+            .input-pair {
+                flex: 1 1 calc(50% - 10px); /* Two columns */
+            }
+        }
+        @media (min-width: 550px) {
+            /* Three smaller inputs in a row */
+            .input-pair:nth-child(-n+3) { 
+                flex: 1 1 calc(33.333% - 13.333px);
+            }
+        }
+        #shuttle-input-pair { /* Keep this one wide if preferred, or adjust */
+             flex: 1 1 100%;
+        }
+
+
+        label { 
+            display: block; 
+            margin-top: 15px; 
+            font-weight: 600; 
+            color: #1565c0; /* Medium Blue */
+        }
+        input[type="number"] { 
+            width: 100%; 
+            padding: 12px; 
+            margin-top: 6px; 
+            box-sizing: border-box; 
+            border: 1px solid #c5d9e8; 
+            border-radius: 8px; 
+            background-color: #f9f9f9;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        input[type="number"]:focus {
+            border-color: #0d47a1;
+            box-shadow: 0 0 5px rgba(13, 71, 161, 0.3);
+            outline: none;
+        }
+
+        /* --- Button Group Styles --- */
+        .button-group { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 10px; 
+            margin-top: 25px; 
+        }
+        @media (min-width: 400px) {
+            .button-group {
+                flex-direction: row; 
+            }
+        }
+        .button-group button { 
+            flex-grow: 1; 
+            padding: 14px 15px; 
+            border: none; 
+            border-radius: 8px; /* Rounded buttons */
+            cursor: pointer; 
+            color: white; 
+            font-weight: bold;
+            transition: background-color 0.3s, transform 0.1s;
+        }
+        .button-group button:active {
+            transform: scale(0.98);
+        }
+        #calculateBtn { background-color: #388e3c; } /* Success Green */
+        #calculateBtn:hover { background-color: #2e7d32; }
+        #resetBtn { background-color: #ffb300; } /* Yellow/Orange */
+        #resetBtn:hover { background-color: #ff8f00; }
+		#resetBlk { background-color: #d32f2f; } /* Error Red */
+		#resetBlk:hover { background-color: #b71c1c; }
+
+        /* --- Results Section Styles --- */
+        #results { 
+            margin-top: 35px; 
+            padding: 25px; 
+            border-radius: 12px;
+            background-color: #e3f2fd; /* Lightest Blue background */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+        }
+        #results h3 { color: #0d47a1; margin-bottom: 15px; }
+        #results h4 {
+            color: #1565c0; 
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+        .result-item { 
+            margin-bottom: 12px;
+            padding-left: 5px;
+        }
+        .cost { 
+            font-weight: 700; 
+            color: #2e7d32; /* Darker Green for emphasis */
+            font-size: 1.3em; 
+        }
+        .calculation-step { 
+            color: #546e7a; /* Muted gray for steps */
+            font-size: 0.95em; 
+            margin-left: 20px;
+            margin-top: 5px;
+            margin-bottom: 5px;
+        }
+    </style>
 </head>
 <body>
 
-    <h2>🏸 Badminton Session Cost Calculator</h2>
-    <p>Base rate updated to **\$8.00** per player. Initial regular players: **12**.</p>
+    <h2>🏸 ShuttleSquad Session Cost Calculator</h2>
+    <p>The **\$8.00** base rate covers the initial court booking for the **12** regular players. Additional costs (shuttles and extra courts) are shared equally among all attending players.</p>
 
-    <label for="newPlayers">New Players Attending:</label>
-    <input type="number" id="newPlayers" value="6" min="0">
+    <div class="calculator-card">
+        <div class="input-group">
+            <div class="input-pair">
+                <label for="newPlayers">New Players Attending:</label>
+                <input type="number" id="newPlayers" value="6" min="0">
+            </div>
 
-    <label for="absentPlayers">Absent Regular Players (out of 12):</label>
-    <input type="number" id="absentPlayers" value="4" min="0" max="12">
-
-    <label for="shuttlesUsed">Total Shuttles Used (Birdies):</label>
-    <input type="number" id="shuttlesUsed" value="14" min="0">
-
-    <label for="additionalCourts">Additional Courts Booked (at $22.50/hr):</label>
-    <input type="number" id="additionalCourts" value="1" min="0">
-
-    <label for="additionalHours">Additional Hours for Courts:</label>
-    <input type="number" id="additionalHours" value="1" min="1">
-    
-    <div class="button-group">
-        <button id="calculateBtn" onclick="calculateCost()">Calculate Costs</button>
-        <button id="resetBtn" onclick="resetForm()">Reset to Example Values</button>
-		<button id="resetBlk" onclick="resetBlkForm()">Reset to Blank Values</button>
-    </div>
-
-    <div id="results">
-        <h3>Calculation Results:</h3>
-        <p>Enter the details above and click 'Calculate Costs'.</p>
-    </div>
-
-    <script>
-        // Store default values for the reset function
-        const DEFAULT_VALUES = {
-            newPlayers: 6,
-            absentPlayers: 4,
-            shuttlesUsed: 14,
-            additionalCourts: 1,
-            additionalHours: 1
-        };
-
-        function calculateCost() {
-            // 1. FIXED BASE VARIABLES (Base Rate updated to $8.00)
-            const BASE_RATE = 8.00; 
-            const INITIAL_REGULARS = 12;
-            const SHUTTLE_COST = 3.25;
-            const COURT_HOURLY_COST = 22.50;
-
-            // 2. INPUT VARIABLES
-            const newPlayers = parseFloat(document.getElementById('newPlayers').value) || 0;
-            const absentPlayers = parseFloat(document.getElementById('absentPlayers').value) || 0;
-            const shuttlesUsed = parseFloat(document.getElementById('shuttlesUsed').value) || 0;
-            const additionalCourts = parseFloat(document.getElementById('additionalCourts').value) || 0;
-            const additionalHours = parseFloat(document.getElementById('additionalHours').value) || 1;
+            <div class="input-pair">
+                <label for="absentPlayers">Absent Regular Players (out of 12):</label>
+                <input type="number" id="absentPlayers" value="4" min="0" max="12">
+            </div>
             
-            // Check for valid player count
-            if (INITIAL_REGULARS < absentPlayers) {
-                 document.getElementById('results').innerHTML = `<p style="color:red;font-weight:bold;">Error: Absent players cannot exceed ${INITIAL_REGULARS}.</p>`;
-                 return;
-            }
+            <div class="input-pair">
+                <label for="shuttlesUsed">Total Shuttles Used (Birdies):</label>
+                <input type="number" id="shuttlesUsed" value="14" min="0">
+            </div>
 
-            // 3. CORE CALCULATIONS
-            const attendingRegPlayers = INITIAL_REGULARS - absentPlayers;
-            const totalAttendingPlayers = attendingRegPlayers + newPlayers;
-            
-            if (totalAttendingPlayers === 0) {
-                 document.getElementById('results').innerHTML = `<p style="color:red;font-weight:bold;">Error: No players are attending the game.</p>`;
-                 return;
-            }
+            <div class="input-pair">
+                <label for="additionalCourts">Additional Courts Booked (at $22.50/hr):</label>
+                <input type="number" id="additionalCourts" value="1" min="0">
+            </div>
 
-            // Expenses and Revenue
-            const shuttleExpense = shuttlesUsed * SHUTTLE_COST;
-            const courtExpense = additionalCourts * additionalHours * COURT_HOURLY_COST;
-            const totalAdditionalExpense = shuttleExpense + courtExpense;
-
-            const newPlayerRevenue = newPlayers * BASE_RATE; 
-
-            // Deficit/Surplus Calculation
-            const netDifference = newPlayerRevenue - totalAdditionalExpense;
-            
-            // Final Cost Sharing
-            const extraCostPerPlayer = netDifference / totalAttendingPlayers;
-
-            // Final Player Costs
-            const finalCostPerPlayer = BASE_RATE - extraCostPerPlayer;
-            const amountToPayByReg = finalCostPerPlayer - BASE_RATE;
-
-
-            // 4. DISPLAY RESULTS
-            const resultsDiv = document.getElementById('results');
-            resultsDiv.innerHTML = `
-                <h3>Cost Breakdown (Attending Players: ${totalAttendingPlayers})</h3>
-                <p class="result-item">Total Attending Players: <strong>${totalAttendingPlayers}</strong> (${attendingRegPlayers} regular + ${newPlayers} new)</p>
-                <p class="result-item">Total Additional Expenses (Courts + Shuttles): <strong>$${totalAdditionalExpense.toFixed(2)}</strong></p>
-                <p class="result-item">Revenue from New Players: $${newPlayerRevenue.toFixed(2)}</p>
-                <p class="result-item">Deficit/Surplus (Net Difference): <strong style="color:${netDifference < 0 ? 'red' : 'green'};">$${netDifference.toFixed(2)}</strong></p>
-                <hr>
-                <p class="result-item">Extra Charge / Refund per Attending Player: <strong>$${Math.abs(extraCostPerPlayer).toFixed(2)}</strong></p>
-                <p class="result-item"><strong>Final Total Cost Per Player:</strong> <span class="cost">$${finalCostPerPlayer.toFixed(2)}</span></p>
-                <hr>
-                
-                <h4>Payment Instructions:</h4>
-                <p>New Players (Total ${newPlayers}): Pay the full final cost.</p>
-                <p class="result-item">**New Players Pay:** <strong>$${finalCostPerPlayer.toFixed(2)}</strong> each.</p>
-                <p>Already-Paid Players (Total ${attendingRegPlayers}): ${amountToPayByReg > 0 ? 'Receive a refund' : 'Pay an extra charge'}.</p>
-                <p class="result-item">**Already-Paid Players ${amountToPayByReg > 0 ? 'Receive' : 'Pay'}:** <strong>$${Math.abs(amountToPayByReg).toFixed(2)}</strong> each.</p>
-            `;
-        }
+            <div class="input-pair">
+                <label for="additionalHours">Additional Hours for Courts:</label>
+                <input type="number" id="additionalHours" value="1" min="1">
+            </div>
+        </div>
         
-        function resetForm() {
-            document.getElementById('newPlayers').value = DEFAULT_VALUES.newPlayers;
-            document.getElementById('absentPlayers').value = DEFAULT_VALUES.absentPlayers;
-            document.getElementById('shuttlesUsed').value = DEFAULT_VALUES.shuttlesUsed;
-            document.getElementById('additionalCourts').value = DEFAULT_VALUES.additionalCourts;
-            document.getElementById('additionalHours').value = DEFAULT_VALUES.additionalHours;
-            calculateCost(); // Recalculate with default values
-        }
+        <div class="button-group">
+            <button id="calculateBtn" onclick="calculateCost()">✅ Calculate Costs</button>
+            <button id="resetBtn" onclick="resetForm()">🔄 Reset to Example Values</button>
+            <button id="resetBlk" onclick="resetBlkForm()">🗑️ Reset to Blank Values</button>
+        </div>
+    </div>
+
+    <div id="results">
+        <h3>Calculation Results:</h3>
+        <p>Enter the details above and click 'Calculate Costs'.</p>
+    </div>
+
+    <script>
+        // Store default values for the reset function
+        const DEFAULT_VALUES = {
+            newPlayers: 6,
+            absentPlayers: 4,
+            shuttlesUsed: 14,
+            additionalCourts: 1,
+            additionalHours: 1
+        };
+
+        function calculateCost() {
+            // 1. FIXED BASE VARIABLES
+            const BASE_RATE = 8.00; 
+            const INITIAL_REGULARS = 12;
+            const SHUTTLE_COST = 3.25;
+            const COURT_HOURLY_COST = 22.50;
+
+            // 2. INPUT VARIABLES
+            const newPlayers = parseFloat(document.getElementById('newPlayers').value) || 0;
+            const absentPlayers = parseFloat(document.getElementById('absentPlayers').value) || 0;
+            const shuttlesUsed = parseFloat(document.getElementById('shuttlesUsed').value) || 0;
+            const additionalCourts = parseFloat(document.getElementById('additionalCourts').value) || 0;
+            const additionalHours = parseFloat(document.getElementById('additionalHours').value) || 1;
+            
+            // Input Validation
+            if (absentPlayers < 0 || absentPlayers > INITIAL_REGULARS) {
+                 document.getElementById('results').innerHTML = `<p style="color:red;font-weight:bold;">❌ Error: Absent players must be between 0 and ${INITIAL_REGULARS}.</p>`;
+                 return;
+            }
+
+            // 3. CORE CALCULATIONS
+            const attendingRegPlayers = INITIAL_REGULARS - absentPlayers;
+            const totalAttendingPlayers = attendingRegPlayers + newPlayers;
+            
+            if (totalAttendingPlayers === 0) {
+                 document.getElementById('results').innerHTML = `<p style="color:red;font-weight:bold;">❌ Error: No players are attending the game.</p>`;
+                 return;
+            }
+
+            // EXPENSE CALCULATION
+            const shuttleExpense = shuttlesUsed * SHUTTLE_COST;
+            const courtExpense = additionalCourts * additionalHours * COURT_HOURLY_COST;
+            const totalCostToShare = shuttleExpense + courtExpense;
+
+            // COST SHARING
+            const costPerPlayerShare = totalCostToShare / totalAttendingPlayers;
+
+            // FINAL PLAYER COSTS
+            const newPlayerFinalCost = BASE_RATE + costPerPlayerShare;
+            const regularPlayerExtraPayment = costPerPlayerShare; 
+
+            // Calculate Net Difference for verification
+            const totalCollected = (attendingRegPlayers * (BASE_RATE + regularPlayerExtraPayment)) + (newPlayers * newPlayerFinalCost);
+            const totalExpense = (INITIAL_REGULARS * BASE_RATE) + totalCostToShare; 
+            const netDifference = totalCollected - totalExpense;
+
+
+            // 4. DISPLAY RESULTS (Using standard HTML bolding)
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = `
+                <h3>📊 Cost Breakdown</h3>
+                <p class="result-item">Total Attending Players: <strong>${totalAttendingPlayers}</strong> (${attendingRegPlayers} regular + ${newPlayers} new)</p>
+                <hr>
+                <h4>Shared Expenses Calculation:</h4>
+                 <p class="calculation-step">Shuttle Expense: ${shuttlesUsed} &times; \$${SHUTTLE_COST.toFixed(2)} = <strong>\$${shuttleExpense.toFixed(2)}</strong></p>
+                 <p class="calculation-step">Extra Court Expense: ${additionalCourts} &times; ${additionalHours} hr &times; \$${COURT_HOURLY_COST.toFixed(2)} = <strong>\$${courtExpense.toFixed(2)}</strong></p>
+                <p class="result-item">Total Additional Cost to Share: <strong>$${totalCostToShare.toFixed(2)}</strong></p>
+                 <p class="calculation-step">Cost Per Player Share: \$${totalCostToShare.toFixed(2)} / ${totalAttendingPlayers} \approx <strong>\$${costPerPlayerShare.toFixed(2)}</strong></p>
+                <hr>
+                <h4>💰 Final Payment Instructions:</h4>
+                <p>New Players (Total ${newPlayers}): Pay Base Rate (\$${BASE_RATE.toFixed(2)}) + Share of Additional Costs.</p>
+                <p class="result-item">**New Players Pay:** <span class="cost">$${newPlayerFinalCost.toFixed(2)}</span> each.</p>
+                <p>Already-Paid Regular Players (Total ${attendingRegPlayers}): Pay only their share of the additional expenses.</p>
+                <p class="result-item">**Regular Players Pay Extra:** <span class="cost">$${regularPlayerExtraPayment.toFixed(2)}</span> each.</p>
+                <hr>
+                <p class="result-item">Net Difference (Verification): <strong style="color:${Math.abs(netDifference) < 0.01 ? 'green' : 'red'};">$${netDifference.toFixed(2)}</strong></p>
+            `;
+        }
+        
+        function resetForm() {
+            document.getElementById('newPlayers').value = DEFAULT_VALUES.newPlayers;
+            document.getElementById('absentPlayers').value = DEFAULT_VALUES.absentPlayers;
+            document.getElementById('shuttlesUsed').value = DEFAULT_VALUES.shuttlesUsed;
+            document.getElementById('additionalCourts').value = DEFAULT_VALUES.additionalCourts;
+            document.getElementById('additionalHours').value = DEFAULT_VALUES.additionalHours;
+            calculateCost(); 
+        }
 		
 		function resetBlkForm() {
-            document.getElementById('newPlayers').value = 0;
-            document.getElementById('absentPlayers').value = 0;
-            document.getElementById('shuttlesUsed').value = 0;
-            document.getElementById('additionalCourts').value = 0;
-            document.getElementById('additionalHours').value = 0;
-            calculateCost(); // Recalculate with default values
-        }
-        
-        // Run calculation once on load with default values
-        document.addEventListener('DOMContentLoaded', calculateCost);
-    </script>
+            document.getElementById('newPlayers').value = 0;
+            document.getElementById('absentPlayers').value = 0;
+            document.getElementById('shuttlesUsed').value = 0;
+            document.getElementById('additionalCourts').value = 0;
+            document.getElementById('additionalHours').value = 1; 
+            calculateCost();
+        }
+        
+        // Run calculation once on load with default values
+        document.addEventListener('DOMContentLoaded', calculateCost);
+    </script>
 
 </body>
 </html>
